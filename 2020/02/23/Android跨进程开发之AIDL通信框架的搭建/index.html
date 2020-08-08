@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="bic Blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="一、概念进程和线程进程：系统资源分配的最小单位 线程：进程内部的独立执行单元，是程序执行的最小单位 进程间的资源和数据相互隔离，进程内的线程间共享大多数资源 跨进程通信（IPC，Inter Process Communication）进程间通过内核提供的机制完成数据交换 Linux跨进程通信的方式：管道，消息队列，信号，共享内存，信号量，Socket套接字（基于C&#x2F;S架构） Android中为什么">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android跨进程开发之AIDL通信框架的搭建">
+<meta property="og:url" content="http://www.bcblog.top/2020/02/23/Android%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%BC%80%E5%8F%91%E4%B9%8BAIDL%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%9A%84%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="bic Blog">
+<meta property="og:description" content="一、概念进程和线程进程：系统资源分配的最小单位 线程：进程内部的独立执行单元，是程序执行的最小单位 进程间的资源和数据相互隔离，进程内的线程间共享大多数资源 跨进程通信（IPC，Inter Process Communication）进程间通过内核提供的机制完成数据交换 Linux跨进程通信的方式：管道，消息队列，信号，共享内存，信号量，Socket套接字（基于C&#x2F;S架构） Android中为什么">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL0.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL1.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL2.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL3.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL4.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL5.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL6.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL10.png">
+<meta property="og:image" content="http://www.bcblog.top/images/AIDL9.png">
+<meta property="article:published_time" content="2020-02-22T16:17:11.000Z">
+<meta property="article:modified_time" content="2020-02-25T14:53:40.000Z">
+<meta property="article:author" content="bic">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.bcblog.top/images/AIDL0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.bcblog.top/2020/02/23/Android跨进程开发之AIDL通信框架的搭建/"/>
+
+
+
+
+
+  <title>Android跨进程开发之AIDL通信框架的搭建 | bic Blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">bic Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.bcblog.top/2020/02/23/Android%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%BC%80%E5%8F%91%E4%B9%8BAIDL%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%9A%84%E6%90%AD%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bic">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bic Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android跨进程开发之AIDL通信框架的搭建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-23T00:17:11+08:00">
+                2020-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4.2k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  19 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h1><h2 id="进程和线程"><a href="#进程和线程" class="headerlink" title="进程和线程"></a>进程和线程</h2><p>进程：系统资源分配的最小单位</p>
+<p>线程：进程内部的独立执行单元，是程序执行的最小单位</p>
+<p>进程间的资源和数据相互隔离，进程内的线程间共享大多数资源</p>
+<h2 id="跨进程通信（IPC，Inter-Process-Communication）"><a href="#跨进程通信（IPC，Inter-Process-Communication）" class="headerlink" title="跨进程通信（IPC，Inter Process Communication）"></a>跨进程通信（IPC，Inter Process Communication）</h2><p>进程间通过内核提供的机制完成数据交换</p>
+<p>Linux跨进程通信的方式：管道，消息队列，信号，共享内存，信号量，Socket套接字（基于C/S架构）</p>
+<h2 id="Android中为什么要引入多进程开发"><a href="#Android中为什么要引入多进程开发" class="headerlink" title="Android中为什么要引入多进程开发?"></a>Android中为什么要引入多进程开发?</h2><p>1.通过多进程将系统资源占用率高的功能剥离到子进程，避免主进程因系统资源紧张造成<strong>OOM</strong>。 </p>
+<p>2.避免应用架构的臃肿。将一些独立的功能剥离到子进程，实现功能的<strong>解耦</strong>。例如实现推送，后台任务等较为单一的功能。</p>
+<p>3.进程间通过相互监听状态实现保活。</p>
+<h2 id="Android跨进程通信的核心：Binder机制"><a href="#Android跨进程通信的核心：Binder机制" class="headerlink" title="Android跨进程通信的核心：Binder机制"></a>Android跨进程通信的核心：<strong>Binder机制</strong></h2><p>基于C/S架构，稳定性好，不需要考虑进程间同步的问题；底层驱动基于内存映射，整体数据拷贝次数只有一次，性能较好；安全性高，UID/PID可见。</p>
+<p>Binder架构：</p>
+<p><img src="/images/AIDL0.png" alt="Binder架构"></p>
+<p>1、编写基于Binder的AIDL文件，提供对外的接口和实现</p>
+<p>2、通过AIDL文件，调用Java层的BinderProxy对象</p>
+<p>3、通过Java层的BinderProxy对象调用Native（C++)层的BpBinder和BBinder对象</p>
+<p>4、最底层，内核层基于Binder驱动，本质是内存的映射</p>
+<h2 id="Android跨进程通信的方式："><a href="#Android跨进程通信的方式：" class="headerlink" title="Android跨进程通信的方式："></a>Android跨进程通信的方式：</h2><p>1、AIDL（基于Binder)</p>
+<p>2、基于AIDL: Intent、Messenger、ContentProvider</p>
+<p>3、文件共享</p>
+<h1 id="二、AIDL通信框架的搭建"><a href="#二、AIDL通信框架的搭建" class="headerlink" title="二、AIDL通信框架的搭建"></a>二、AIDL通信框架的搭建</h1><h2 id="AIDL"><a href="#AIDL" class="headerlink" title="AIDL:"></a>AIDL:</h2><p>是定义IPC过程中接口的一种描述语言</p>
+<p>AIDL文件在编译过程中生成接口的实现类，用于IPC通信</p>
+<h2 id="项目场景："><a href="#项目场景：" class="headerlink" title="项目场景："></a>项目场景：</h2><p>子进程中有一个<strong>连接服务</strong>和一个<strong>消息服务</strong>。</p>
+<p>连接服务中，子进程向主进程提供三个方法：</p>
+<table>
+<thead>
+<tr>
+<th align="center">方法</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>connect()</code></td>
+<td align="center">建立连接</td>
+</tr>
+<tr>
+<td align="center"><code>disconnect()</code></td>
+<td align="center">断开连接</td>
+</tr>
+<tr>
+<td align="center"><code>isConnected()</code></td>
+<td align="center">获取链接状态</td>
+</tr>
+</tbody></table>
+<p>消息服务中，主进程调用三个方法：</p>
+<table>
+<thead>
+<tr>
+<th align="center">方法</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>sendMessage()</code></td>
+<td align="center">通过子进程的连接发送消息</td>
+</tr>
+<tr>
+<td align="center"><code>registerMessageReceiverListener()</code></td>
+<td align="center">监听子进程中的消息</td>
+</tr>
+<tr>
+<td align="center"><code>unRegisterMessageReceiverListener()</code></td>
+<td align="center">注销监听</td>
+</tr>
+</tbody></table>
+<h2 id="代码实现："><a href="#代码实现：" class="headerlink" title="代码实现："></a>代码实现：</h2><h2 id="1、准备工作"><a href="#1、准备工作" class="headerlink" title="1、准备工作"></a>1、准备工作</h2><p>1.1.创建子进程的service用于启动子进程，并在Manifest中将该service定义子在私有进程中。</p>
+<p>RemoteService.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *管理和提供子进程的连接和消息服务</span></span><br><span class="line"><span class="comment"> *<span class="doctag">@author</span> 毕淳</span></span><br><span class="line"><span class="comment"> *<span class="doctag">@date</span> 2020/2/21 0021 22:50</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>AndroidManifest.xml:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;service</span><br><span class="line">     android:name=<span class="string">".RemoteService"</span></span><br><span class="line">     android:enabled=<span class="string">"true"</span></span><br><span class="line">     android:exported=<span class="string">"true"</span></span><br><span class="line">     android:process=<span class="string">":remote"</span>&gt; <span class="comment">//将该service定义子在私有进程中</span></span><br><span class="line">&lt;/service&gt;ro'i'd</span><br></pre></td></tr></table></figure>
+
+
+
+<p>1.2.在MainActivity中启动RemoteService，Android中可通过<code>startService()</code>或<code>bindService()</code>启动Service，考虑到需要通过AIDL进行进程间通信，因此使用<code>bindService()</code>方法。</p>
+<p>MainActivity.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        </span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, RemoteService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        bindService(intent, <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName componentName, IBinder iBinder)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName componentName)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, Context.BIND_AUTO_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2、AIDL实现连接服务的IPC通信"><a href="#2、AIDL实现连接服务的IPC通信" class="headerlink" title="2、AIDL实现连接服务的IPC通信"></a>2、AIDL实现连接服务的IPC通信</h2><p>2.1.建立连接服务的AIDL文件，命名为IConnectionService.</p>
+<p>images/<img src="/images/AIDL1.png" alt></p>
+<p><img src="/images/AIDL2.png" alt></p>
+<p>FInish后，会自动创建一个与代码同路径的AIDL文件IConnectionService.aidl.</p>
+<p><img src="/images/AIDL3.png" alt></p>
+<p>2.2.在连接服务的AIDL文件中定义所需的三个方法</p>
+<p>IConnectionService.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//连接服务</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IConnectionService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">connect</span><span class="params">()</span></span>; <span class="comment">//连接</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">disconnect</span><span class="params">()</span></span>; <span class="comment">//断连</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isConnected</span><span class="params">()</span></span>; <span class="comment">//获取子进程连接状态</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法定义完成后，编译后系统会自动生成一个IConnectionService的实现类：</p>
+<p><img src="/images/AIDL4.png" alt></p>
+<p>2.3.在RemoteService中实现连接服务</p>
+<p>RemoteService.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *管理和提供子进程的连接和消息服务</span></span><br><span class="line"><span class="comment"> *<span class="doctag">@author</span> 毕淳</span></span><br><span class="line"><span class="comment"> *<span class="doctag">@date</span> 2020/2/21 0021 22:50</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> IConnectionService connectionService = <span class="keyword">new</span> IConnectionService.Stub() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">disconnect</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isConnected</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> connectionService.asBinder();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Stub是IConnectionService类内部的一个抽象类，Stub类中定义了三个抽象方法，即我们在AIDL连接服务中定义的三个方法。</p>
+<p>2.4.实现连接服务中子进程提供给主进程的三个方法</p>
+<p>RemoteService.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 管理和提供子进程的连接和消息服务</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> 毕淳</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2020/2/21 0021 22:50</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isConnected = <span class="keyword">false</span>; <span class="comment">//判断连接状态的标志位</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Handler mHandler = <span class="keyword">new</span> Handler(Looper.getMainLooper());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> IConnectionService connectionService = <span class="keyword">new</span> IConnectionService.Stub() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">5000</span>); <span class="comment">//建立连接过程一般是一个阻塞过程，因此这里我们用一个休眠5s的Thread去模拟</span></span><br><span class="line">                isConnected = <span class="keyword">true</span>;</span><br><span class="line">                <span class="comment">//注意：Toast是跑在主进程中的，而AIDL调用的服务端的实现是跑在对应Binder的线程池中，所以connect(),disconnect(),isConnect()三个方法都是跑在三个不同的子线程中的，因此如下直接Toast没有效果</span></span><br><span class="line">                <span class="comment">//Toast.makeText(RemoteService.this, "connected", Toast.LENGTH_SHORT).show();</span></span><br><span class="line">                <span class="comment">//正确的做法是通过Handler切换到主线程后再Toast</span></span><br><span class="line">                mHandler.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        Toast.makeText(RemoteService.<span class="keyword">this</span>, <span class="string">"connected"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">disconnect</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            isConnected = <span class="keyword">false</span>;</span><br><span class="line">            Toast.makeText(RemoteService.<span class="keyword">this</span>, <span class="string">"disconnect"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isConnected</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> isConnected;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> connectionService.asBinder(); <span class="comment">//返回IBinder对象，主进程通过这个IBinder对象获取连接服务的代理</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.5在MainActivity中实现对连接服务的跨进程IPC调用</p>
+<p>（1）定义三个Button用于触发连接服务的三个方法并设置对应的点击事件</p>
+<p>activity_main.xml:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;LinearLayout xmlns:android&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;apk&#x2F;res&#x2F;android&quot;</span><br><span class="line">    xmlns:tools&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;tools&quot;</span><br><span class="line">    android:layout_width&#x3D;&quot;match_parent&quot;</span><br><span class="line">    android:layout_height&#x3D;&quot;match_parent&quot;</span><br><span class="line">    android:gravity&#x3D;&quot;center&quot;</span><br><span class="line">    tools:context&#x3D;&quot;.MainActivity&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id&#x3D;&quot;@+id&#x2F;btn_connect&quot;</span><br><span class="line">        android:layout_width&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:text&#x3D;&quot;连接&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id&#x3D;&quot;@+id&#x2F;btn_disconnect&quot;</span><br><span class="line">        android:layout_width&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:text&#x3D;&quot;断连&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id&#x3D;&quot;@+id&#x2F;btn_isConnected&quot;</span><br><span class="line">        android:layout_width&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:text&#x3D;&quot;连接状态&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<p>（2）在MainActivity中实现连接服务中三个方法的IPC调用。首先需要定义一个IConnectionService对象connectionServiceProxy，相当于是子进程中IConnectionService调用对象的一个代理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> IConnectionService connectionServiceProxy;</span><br></pre></td></tr></table></figure>
+
+<p>（3）connectionServiceProxy的初始化：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">bindService(intent, <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName componentName, IBinder iBinder)</span> </span>&#123;</span><br><span class="line">                connectionServiceProxy = IConnectionService.Stub.asInterface(iBinder);<span class="comment">//初始化</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName componentName)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, Context.BIND_AUTO_CREATE);</span><br></pre></td></tr></table></figure>
+
+<p>（4）实现按钮点击事件后，MainActivity的完整代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> <span class="keyword">implements</span> <span class="title">View</span>.<span class="title">OnClickListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Button btn_connect;</span><br><span class="line">    <span class="keyword">private</span> Button btn_disconnect;</span><br><span class="line">    <span class="keyword">private</span> Button btn_isConnected;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> IConnectionService connectionServiceProxy;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line">        btn_connect = findViewById(R.id.btn_connect);</span><br><span class="line">        btn_disconnect = findViewById(R.id.btn_disconnect);</span><br><span class="line">        btn_isConnected = findViewById(R.id.btn_isConnected);</span><br><span class="line"></span><br><span class="line">        btn_connect.setOnClickListener(<span class="keyword">this</span>);</span><br><span class="line">        btn_disconnect.setOnClickListener(<span class="keyword">this</span>);</span><br><span class="line">        btn_isConnected.setOnClickListener(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, RemoteService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        bindService(intent, <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName componentName, IBinder iBinder)</span> </span>&#123;</span><br><span class="line">                connectionServiceProxy = IConnectionService.Stub.asInterface(iBinder);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName componentName)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, Context.BIND_AUTO_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View view)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (view.getId()) &#123;</span><br><span class="line">            <span class="keyword">case</span> R.id.btn_connect:</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    connectionServiceProxy.connect();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> R.id.btn_disconnect:</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    connectionServiceProxy.disconnect();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> R.id.btn_isConnected:</span><br><span class="line">                <span class="keyword">boolean</span> isConnected = <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    isConnected = connectionServiceProxy.isConnected();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                Toast.makeText(<span class="keyword">this</span>, String.valueOf(isConnected), Toast.LENGTH_SHORT).show();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行，点击连接，<strong>界面阻塞</strong>5s后弹出connected</p>
+<p><img src="/images/AIDL5.png" alt>  <img src="/images/AIDL6.png" alt></p>
+<p>这样的IPC调用是阻塞式的，即主进程中调用的<code>connectionServiceProxy.connect()</code>方法需要等待服务端（子进程）中的<code>connect()</code>方法执行结束后，才能执行完成。这样便会存在一个问题，设想这样一个场景，用户点击连接后，界面会卡顿住，等到后台连接服务完成连接后，界面才恢复正常，这样显然是不合理的。合理的状态是，AIDL进行IPC通信时，子线程的耗时不会影响到主线程，<strong>正确的做法是使用AIDL中的<code>oneway</code>关键字修饰<code>connect()</code>方法：</strong></p>
+<p>IConnectionService.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//连接服务e</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IConnectionService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">oneway <span class="keyword">void</span> <span class="title">connect</span><span class="params">()</span></span>; <span class="comment">//连接</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">disconnect</span><span class="params">()</span></span>; <span class="comment">//断连</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isConnected</span><span class="params">()</span></span>; <span class="comment">//获取子进程连接状态</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：AIDL中，用<code>oneway</code>修饰的方法不能带有任何返回值</p>
+<h2 id="三、AIDL实现消息服务的IPC通信"><a href="#三、AIDL实现消息服务的IPC通信" class="headerlink" title="三、AIDL实现消息服务的IPC通信"></a>三、AIDL实现消息服务的IPC通信</h2><p>建立消息服务的AIDL文件，命名为IMessageService.</p>
+<p>IMessageService.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//消息服务</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IMessageService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">registerMessageReceiverListener</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">unRegisterMessageReceiverListener</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>消息服务需要定义三个方法：<code>sendMessage()</code>、<code>registerMessageReceiverListener()</code>，<code>unregisterMessageReceiverListener()</code>。对于发送消息<code>sendMessage()</code>，需要定义一个消息的实体类作为该方法的参数。新建实体类Message。</p>
+<p><img src="/images/AIDL10.png" alt></p>
+<p>在Message中定义两个对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> String content;  <span class="comment">//消息内容</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">boolean</span> isSendSuccess;  <span class="comment">//消息发送状态</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>一个实体对象要在AIDL中进行IPC通信，必须实现序列化接口，Android中常用Parcelable方式实现序列化接口。</strong></p>
+<p>Android studio可通过插件的方式快速实现Parceble接口（安装<em>Android Parcelable code generator</em>插件即可）</p>
+<p>最后再定义好Message实体类两个对象的<code>get()</code>和<code>set()</code>方法。</p>
+<p>Message.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo.entity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.os.Parcel;</span><br><span class="line"><span class="keyword">import</span> android.os.Parcelable;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Message</span> <span class="keyword">implements</span> <span class="title">Parcelable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String content;  <span class="comment">//消息内容</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isSendSuccess;  <span class="comment">//消息发送状态</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">describeContents</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeToParcel</span><span class="params">(Parcel dest, <span class="keyword">int</span> flags)</span> </span>&#123;</span><br><span class="line">        dest.writeString(<span class="keyword">this</span>.content);</span><br><span class="line">        dest.writeByte(<span class="keyword">this</span>.isSendSuccess ? (<span class="keyword">byte</span>) <span class="number">1</span> : (<span class="keyword">byte</span>) <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Message</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">Message</span><span class="params">(Parcel in)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.content = in.readString();</span><br><span class="line">        <span class="keyword">this</span>.isSendSuccess = in.readByte() != <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Parcelable.Creator&lt;Message&gt; CREATOR = <span class="keyword">new</span> Parcelable.Creator&lt;Message&gt;() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Message <span class="title">createFromParcel</span><span class="params">(Parcel source)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Message(source);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Message[] newArray(<span class="keyword">int</span> size) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Message[size];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getContent</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> content;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContent</span><span class="params">(String content)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.content = content;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSendSuccess</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> isSendSuccess;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSendSuccess</span><span class="params">(<span class="keyword">boolean</span> sendSuccess)</span> </span>&#123;</span><br><span class="line">        isSendSuccess = sendSuccess;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>接下来需要将Message对象作为参数传入<code>sendMessage()</code>方法，但aidl文件是无法直接引用.java的文件的。因此需要定义一个与Message.java对应的（<strong>同名且同路径</strong>）aidl文件Message.aidl.</p>
+<p><img src="/images/AIDL9.png" alt></p>
+<p>在Message.aidl中需要定义一个名为Message的parcelable类型的对象，将Message.aidl与Message.java进行关联。</p>
+<p>Message.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo.entity;</span><br><span class="line">parcelable Message;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在IMessageService.aidl中，<strong>导入Message实体类</strong>并将Message实体类对象传入<code>sendMessage()</code>方法。<strong>aidl文件中的方法参数若是一个实体类型而非基本类型，必须用in/out关键字修饰</strong></p>
+<p>IMessageService.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo;</span><br><span class="line"><span class="keyword">import</span> com.example.ipcdemo.entity.Message;</span><br><span class="line"><span class="comment">//消息服务</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IMessageService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(in Message message)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">registerMessageReceiverListener</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">unRegisterMessageReceiverListener</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>对于<code>registerMessageReceiverListener()</code>和<code>unRegisterMessageReceiverListener()</code>方法，需要传入消息接收的Listener对象，新建MessageReceiveListener.aidl文件，并定义<code>onReceiveMessage()</code>方法，将Message实体对象作为参数传入。相当于服务端接收消息的回调。</p>
+<p>MessageReceiveListener.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo;</span><br><span class="line"><span class="keyword">import</span> com.example.ipcdemo.entity.Message;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">MessageReceiveListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onReceiveMessage</span><span class="params">(in Message message)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>IMessageService.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo;</span><br><span class="line"><span class="keyword">import</span> com.example.ipcdemo.entity.Message;</span><br><span class="line"><span class="keyword">import</span> com.example.ipcdemo.MessageReceiveListener;</span><br><span class="line"><span class="comment">//消息服务</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IMessageService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(in Message message)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">registerMessageReceiverListener</span><span class="params">(MessageReceiveListener messageReceiveListener)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">unRegisterMessageReceiverListener</span><span class="params">(MessageReceiveListener messageReceiveListener)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>到这里，与消息服务有关的aidl文件就创建完成了，编译后，系统会自动生成相关的实现，接下来需要在RemoteService中完成消息服务的实现。</p>
+<p>由于之前在RemoteService中返回的是连接服务的IBinder对象，即<code>connectionService.asBinder()</code>，从而提供给主进程实现连接服务的IPC调用。实现消息服务后，又需要返回消息服务的IBinder对象给主进程，因此需要新建一个通用的接口作为RemoteService中onBind方法的返回值。新建IServiceManager的aidl文件作为服务的管理者，在RemoteService中返回IServiceManager的IBinder对象即可，这样，主进程就可以根据该IBinder对象，去查询所需的服务，进而完成相关服务的IPC调用。</p>
+<p>IServiceManager.aidl:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IServiceManager</span> </span>&#123;</span><br><span class="line">    <span class="function">IBinder <span class="title">getService</span><span class="params">(String ServiceName)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>接下来在RemoteService中实现消息服务IMessageService和服务管理者IServiceManager，在IServiceManagerd的实现中，根据服务的名称返回对应服务的IBinder对象，最后在<code>onBind()</code>方法中返回IServiceManager的IBinder对象。</p>
+<p>RemoteService.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.ipcdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.app.Service;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.os.Handler;</span><br><span class="line"><span class="keyword">import</span> android.os.IBinder;</span><br><span class="line"><span class="keyword">import</span> android.os.Looper;</span><br><span class="line"><span class="keyword">import</span> android.os.RemoteCallbackList;</span><br><span class="line"><span class="keyword">import</span> android.os.RemoteException;</span><br><span class="line"><span class="keyword">import</span> android.widget.Toast;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.example.ipcdemo.entity.Message;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ScheduledFuture;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ScheduledThreadPoolExecutor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Handler mHandler = <span class="keyword">new</span> Handler(Looper.getMainLooper());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isConnected = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RemoteCallbackList&lt;MessageReceiveListener&gt; messageReceiveListenerRemoteCallbackList = <span class="keyword">new</span> RemoteCallbackList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;  <span class="comment">//定时任务</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ScheduledFuture scheduledFuture;</span><br><span class="line"></span><br><span class="line">    IConnectionService connectionService = <span class="keyword">new</span> IConnectionService.Stub() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">                isConnected = <span class="keyword">true</span>;</span><br><span class="line">                mHandler.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        Toast.makeText(RemoteService.<span class="keyword">this</span>, <span class="string">"connect"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line"></span><br><span class="line">                scheduledFuture = scheduledThreadPoolExecutor.scheduleAtFixedRate(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        <span class="keyword">int</span> size = messageReceiveListenerRemoteCallbackList.beginBroadcast();</span><br><span class="line">                        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">                            Message message = <span class="keyword">new</span> Message();</span><br><span class="line">                            message.setContent(<span class="string">"this message from remote"</span>);</span><br><span class="line">                            <span class="keyword">try</span> &#123;</span><br><span class="line">                                messageReceiveListenerRemoteCallbackList.getBroadcastItem(i).onReceiveMessage(message);  <span class="comment">//将子进程收到的消息回调给主进程</span></span><br><span class="line">                            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                                e.printStackTrace();</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        messageReceiveListenerRemoteCallbackList.finishBroadcast();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;, <span class="number">5000</span>, <span class="number">5000</span>, TimeUnit.MILLISECONDS); <span class="comment">//在连接建立成功之后，通过定时任务模拟消息接收的过程，每隔5s收到一条消息</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">disConnect</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            isConnected = <span class="keyword">false</span>;</span><br><span class="line">            scheduledFuture.cancel(<span class="keyword">true</span>);  <span class="comment">//断连之后，停止定时任务</span></span><br><span class="line">            mHandler.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    Toast.makeText(RemoteService.<span class="keyword">this</span>, <span class="string">"disConnect"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isConnected</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> isConnected;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> IMessageService messageService = <span class="keyword">new</span> IMessageService.Stub() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(<span class="keyword">final</span> Message message)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            mHandler.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    Toast.makeText(RemoteService.<span class="keyword">this</span>, message.getContent(), Toast.LENGTH_SHORT).show();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (isConnected) &#123;</span><br><span class="line">                message.setSendSuccess(<span class="keyword">true</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                message.setSendSuccess(<span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerMessageReceiverListener</span><span class="params">(MessageReceiveListener messageReceiveListener)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (messageReceiveListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                messageReceiveListenerRemoteCallbackList.register(messageReceiveListener);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unRegisterMessageReceiverListener</span><span class="params">(MessageReceiveListener messageReceiveListener)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (messageReceiveListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                messageReceiveListenerRemoteCallbackList.unregister(messageReceiveListener);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> IServiceManager serviceManager = <span class="keyword">new</span> IServiceManager.Stub() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> IBinder <span class="title">getService</span><span class="params">(String ServiceName)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (IConnectionService<span class="class">.<span class="keyword">class</span>.<span class="title">getSimpleName</span>().<span class="title">equals</span>(<span class="title">ServiceName</span>)) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> connectionService.asBinder();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (IMessageService<span class="class">.<span class="keyword">class</span>.<span class="title">getSimpleName</span>().<span class="title">equals</span>(<span class="title">ServiceName</span>)) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> messageService.asBinder();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> serviceManager.asBinder();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate();</span><br><span class="line">        scheduledThreadPoolExecutor = <span class="keyword">new</span> ScheduledThreadPoolExecutor(<span class="number">1</span>); <span class="comment">//初始化定时任务</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>RemoteService中实现消息服务时，<code>sendMessage()</code>方法实现是，切换到主线程，将消息的内容Toast出来，并根据连接的状态<code>isConnnected</code>设置消息发送的状态<code>message.setSendSuccess(true/flase);</code>对于注册/注销消息接收监听的方法<code>registerMessageReceiverListener()</code>,<code>unRegisterMessageReceiverListener()</code>通过一个泛型为<code>MessageReceiveListener</code>的<code>RemoteCallbackList</code>去存储消息监听。接下来需要<strong>模拟消息接收的过程</strong>，模拟的方法是在连接建立成功之后，定义一个间隔5s的定时任务，通过遍历监听的容器<code>messageReceiveListenerArrayList</code>，将子进程收到的消息回调给主进程。最后在连接服务的<code>disconnect()</code>方法中停止该定时任务。</p>
+<p>到这里remote进程中消息服务的定义和实现就完成了，接下来需要在主进程中完成消息服务相关接口的设置，并实现主进程和子进程间消息服务的IPC通信。</p>
+<p>首先在MainActivity中初始化IMessageService和IServiceManger，之前只有连接服务时，在<code>onServiceConnected()</code>中直接初始化即可，现在由于使用了IServiceManger，需要作一些改动，原先只有连接服务时对连接服务的初始化：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, RemoteService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        bindService(intent, <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder iBinder)</span> </span>&#123;</span><br><span class="line">                connectionServiceProxy = IConnectionService.Stub.asInterface(iBinder);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, Context.BIND_AUTO_CREATE);</span><br></pre></td></tr></table></figure>
+
+<p>增加了消息服务IMessageService和服务管理者IServiceManger后，应改为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, RemoteService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        bindService(intent, <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder iBinder)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    serviceManagerProxy = IServiceManager.Stub.asInterface(iBinder);</span><br><span class="line">                    connectionServiceProxy = IConnectionService.Stub.asInterface(serviceManagerProxy.getService(connectionServiceProxy.getClass().getSimpleName()));</span><br><span class="line">                    messageServiceProxy = IMessageService.Stub.asInterface(serviceManagerProxy.getService(messageServiceProxy.getClass().getSimpleName()));</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, Context.BIND_AUTO_CREATE);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>消息服务对象初始化完成后，需要在主进程中完成消息服务三个方法的实现，即主进程IPC调用的实现。再定义三个Button，并在对应的点击事件中完成消息服务三个方法的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> R.id.btn_sendMessage:</span><br><span class="line">                Message message = <span class="keyword">new</span> Message();</span><br><span class="line">                message.setContent(<span class="string">"message send from main"</span>);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    messageServiceProxy.sendMessage(message);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> R.id.btn_register:</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    messageServiceProxy.registerMessageReceiverListener(messageReceiveListener);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> R.id.btn_unRegister:</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    messageServiceProxy.unRegisterMessageReceiverListener(messageReceiveListener);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+
+<p>主进程设置实现消息服务的监听和取消监听时，需要在MainActivty中定义一个MessageReceiverListener对象，并完成其AIDL的实现。这里MessageReceiverListener的方法的实现是在主进程中的，通过<code>messageServiceProxy.registerMessageReceiverListener()</code>，把<code>messageReceiveListener</code>对象设置到RemoteService中，相当于完成了一次remote进程对主进程的IPC调用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> MessageReceiveListener messageReceiveListener = <span class="keyword">new</span> MessageReceiveListener.Stub() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceiveMessage</span><span class="params">(<span class="keyword">final</span> Message message)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            <span class="keyword">new</span> Handler(Looper.getMainLooper()).post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    Toast.makeText(MainActivity.<span class="keyword">this</span>, message.getContent(), Toast.LENGTH_SHORT).show();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;); <span class="comment">//通过Handler切换到主线程之后再进程UI操作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+	
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/01/Android-UI%E4%B9%8BRadioGroup-Fragment%E5%AE%9E%E7%8E%B0%E9%A1%B5%E9%9D%A2%E5%88%87%E6%8D%A2/" rel="prev" title="Android UI之RadioGroup+Fragment实现页面切换">
+                Android UI之RadioGroup+Fragment实现页面切换 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="bic" />
+            
+              <p class="site-author-name" itemprop="name">bic</p>
+              <p class="site-description motion-element" itemprop="description">peace</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、概念"><span class="nav-number">1.</span> <span class="nav-text">一、概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#进程和线程"><span class="nav-number">1.1.</span> <span class="nav-text">进程和线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跨进程通信（IPC，Inter-Process-Communication）"><span class="nav-number">1.2.</span> <span class="nav-text">跨进程通信（IPC，Inter Process Communication）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android中为什么要引入多进程开发"><span class="nav-number">1.3.</span> <span class="nav-text">Android中为什么要引入多进程开发?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android跨进程通信的核心：Binder机制"><span class="nav-number">1.4.</span> <span class="nav-text">Android跨进程通信的核心：Binder机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android跨进程通信的方式："><span class="nav-number">1.5.</span> <span class="nav-text">Android跨进程通信的方式：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、AIDL通信框架的搭建"><span class="nav-number">2.</span> <span class="nav-text">二、AIDL通信框架的搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AIDL"><span class="nav-number">2.1.</span> <span class="nav-text">AIDL:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目场景："><span class="nav-number">2.2.</span> <span class="nav-text">项目场景：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实现："><span class="nav-number">2.3.</span> <span class="nav-text">代码实现：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1、准备工作"><span class="nav-number">2.4.</span> <span class="nav-text">1、准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、AIDL实现连接服务的IPC通信"><span class="nav-number">2.5.</span> <span class="nav-text">2、AIDL实现连接服务的IPC通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、AIDL实现消息服务的IPC通信"><span class="nav-number">2.6.</span> <span class="nav-text">三、AIDL实现消息服务的IPC通信</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bic</span>
+
+  
+  
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+  
+
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">总访客<span id="busuanzi_value_site_uv"></span>人</span>
+    <span class="post-meta-divider">|</span>
+
+  
+
+</div>
+
+<section class="footer-time">
+    <span class="footer__copyright">
+    <div>
+    <span id="span_dt_dt"> </span>
+    <script language="javascript">
+      function show_date_time(){
+        window.setTimeout("show_date_time()", 1000);
+        BirthDay=new Date("12/12/2019 23:45:12");//这个日期是可以修改的
+        today=new Date();
+        timeold=(today.getTime()-BirthDay.getTime());//其实仅仅改了这里
+        sectimeold=timeold/1000
+        secondsold=Math.floor(sectimeold);
+        msPerDay=24*60*60*1000
+        e_daysold=timeold/msPerDay
+        daysold=Math.floor(e_daysold);
+        e_hrsold=(e_daysold-daysold)*24;
+        hrsold=Math.floor(e_hrsold);
+        e_minsold=(e_hrsold-hrsold)*60;
+        minsold=Math.floor((e_hrsold-hrsold)*60);
+        seconds=Math.floor((e_minsold-minsold)*60);
+        span_dt_dt.innerHTML="bic Blog已经运行 "+daysold+" 天 "+hrsold+" 小时 "+minsold+" 分 "+seconds+" 秒";
+      }
+      show_date_time();
+    </script>
+    </div>
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+</section>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

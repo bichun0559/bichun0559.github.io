@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="bic Blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="当前很多App的主页都采用通过底部或上部的导航按钮实现页面的切换，比如微信，淘宝等。这种UI比较简单的实现方法是通过RadioGroup+Fragment去实现，通过在RadioGroup的选中事件监听中实现Fragment切换的逻辑即可。 一、RadioGroup定义新建模块，在MainActivity的布局中定义一个位于底部RadioGroup，其中包含四个RadioButton。 activ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android UI之RadioGroup+Fragment实现页面切换">
+<meta property="og:url" content="http://www.bcblog.top/2020/03/01/Android-UI%E4%B9%8BRadioGroup-Fragment%E5%AE%9E%E7%8E%B0%E9%A1%B5%E9%9D%A2%E5%88%87%E6%8D%A2/index.html">
+<meta property="og:site_name" content="bic Blog">
+<meta property="og:description" content="当前很多App的主页都采用通过底部或上部的导航按钮实现页面的切换，比如微信，淘宝等。这种UI比较简单的实现方法是通过RadioGroup+Fragment去实现，通过在RadioGroup的选中事件监听中实现Fragment切换的逻辑即可。 一、RadioGroup定义新建模块，在MainActivity的布局中定义一个位于底部RadioGroup，其中包含四个RadioButton。 activ">
+<meta property="article:published_time" content="2020-03-01T02:40:42.000Z">
+<meta property="article:modified_time" content="2020-03-01T02:41:46.000Z">
+<meta property="article:author" content="bic">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.bcblog.top/2020/03/01/Android-UI之RadioGroup-Fragment实现页面切换/"/>
+
+
+
+
+
+  <title>Android UI之RadioGroup+Fragment实现页面切换 | bic Blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">bic Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.bcblog.top/2020/03/01/Android-UI%E4%B9%8BRadioGroup-Fragment%E5%AE%9E%E7%8E%B0%E9%A1%B5%E9%9D%A2%E5%88%87%E6%8D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bic">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bic Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android UI之RadioGroup+Fragment实现页面切换</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-01T10:40:42+08:00">
+                2020-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.5k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>当前很多App的主页都采用通过底部或上部的导航按钮实现页面的切换，比如微信，淘宝等。这种UI比较简单的实现方法是通过RadioGroup+Fragment去实现，通过在RadioGroup的选中事件监听中实现Fragment切换的逻辑即可。</p>
+<h1 id="一、RadioGroup定义"><a href="#一、RadioGroup定义" class="headerlink" title="一、RadioGroup定义"></a>一、RadioGroup定义</h1><p>新建模块，在MainActivity的布局中定义一个位于底部RadioGroup，其中包含四个RadioButton。</p>
+<p>activity_main.xml:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;LinearLayout xmlns:android&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;apk&#x2F;res&#x2F;android&quot;</span><br><span class="line">    xmlns:tools&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;tools&quot;</span><br><span class="line">    android:layout_width&#x3D;&quot;match_parent&quot;</span><br><span class="line">    android:layout_height&#x3D;&quot;match_parent&quot;</span><br><span class="line">    tools:context&#x3D;&quot;.MainActivity&quot;</span><br><span class="line">    &gt;</span><br><span class="line"></span><br><span class="line">    &lt;RadioGroup</span><br><span class="line">        android:id&#x3D;&quot;@+id&#x2F;radioGroup&quot;</span><br><span class="line">        android:layout_width&#x3D;&quot;match_parent&quot;</span><br><span class="line">        android:layout_height&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:layout_gravity&#x3D;&quot;bottom&quot;</span><br><span class="line">        android:orientation&#x3D;&quot;horizontal&quot;</span><br><span class="line">        android:background&#x3D;&quot;@color&#x2F;gray&quot;&gt;</span><br><span class="line">        </span><br><span class="line">        &lt;RadioButton</span><br><span class="line">            android:id&#x3D;&quot;@+id&#x2F;btn_general&quot;</span><br><span class="line">            style&#x3D;&quot;@style&#x2F;MyRadioButtonStyle&quot;</span><br><span class="line">            android:checked&#x3D;&quot;true&quot;</span><br><span class="line">            android:drawableTop&#x3D;&quot;@drawable&#x2F;icon_general_selector&quot;</span><br><span class="line">            android:text&#x3D;&quot;通用设置&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;RadioButton</span><br><span class="line">            android:id&#x3D;&quot;@+id&#x2F;btn_sound&quot;</span><br><span class="line">            style&#x3D;&quot;@style&#x2F;MyRadioButtonStyle&quot;</span><br><span class="line">            android:drawableTop&#x3D;&quot;@drawable&#x2F;icon_sound_selector&quot;</span><br><span class="line">            android:text&#x3D;&quot;声音设置&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;RadioButton</span><br><span class="line">            android:id&#x3D;&quot;@+id&#x2F;btn_system&quot;</span><br><span class="line">            style&#x3D;&quot;@style&#x2F;MyRadioButtonStyle&quot;</span><br><span class="line">            android:drawableTop&#x3D;&quot;@drawable&#x2F;icon_system_selector&quot;</span><br><span class="line">            android:text&#x3D;&quot;系统设置&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;RadioButton</span><br><span class="line">            android:id&#x3D;&quot;@+id&#x2F;btn_operation&quot;</span><br><span class="line">            style&#x3D;&quot;@style&#x2F;MyRadioButtonStyle&quot;</span><br><span class="line">            android:drawableTop&#x3D;&quot;@drawable&#x2F;icon_operation_selector&quot;</span><br><span class="line">            android:text&#x3D;&quot;操作说明&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;RadioGroup&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;&#x2F;LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<p>icon_general_selector.xml：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;selector xmlns:android&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;apk&#x2F;res&#x2F;android&quot;&gt;</span><br><span class="line">    &lt;item android:drawable&#x3D;&quot;@drawable&#x2F;icon_general_p&quot; android:state_checked&#x3D;&quot;true&quot; &#x2F;&gt;</span><br><span class="line">    &lt;item android:drawable&#x3D;&quot;@drawable&#x2F;icon_general_n&quot; android:state_checked&#x3D;&quot;false&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;selector&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>因为四个RadioButton的样式属性均一致，为了避免代码冗余，在styles文件中定义MyRadioButtonStyle用于规定RadioButton的属性：</p>
+<p>styles.xml:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;resources&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- Base application theme. --&gt;</span><br><span class="line">    &lt;style name&#x3D;&quot;AppTheme&quot; parent&#x3D;&quot;Theme.AppCompat.Light.DarkActionBar&quot;&gt;</span><br><span class="line">        &lt;!-- Customize your theme here. --&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;colorPrimary&quot;&gt;@color&#x2F;colorPrimary&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;colorPrimaryDark&quot;&gt;@color&#x2F;colorPrimaryDark&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;colorAccent&quot;&gt;@color&#x2F;colorAccent&lt;&#x2F;item&gt;</span><br><span class="line">    &lt;&#x2F;style&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;style name&#x3D;&quot;MyRadioButtonStyle&quot;&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;android:gravity&quot;&gt;center&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;android:layout_height&quot;&gt;50dp&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;android:layout_width&quot;&gt;0dp&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;android:layout_weight&quot;&gt;1&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;android:button&quot;&gt;@null&lt;&#x2F;item&gt;</span><br><span class="line">        &lt;item name&#x3D;&quot;android:textColor&quot;&gt;@color&#x2F;text_selector&lt;&#x2F;item&gt;</span><br><span class="line">    &lt;&#x2F;style&gt;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;resources&gt;</span><br></pre></td></tr></table></figure>
+
+<p>text_selector.xml:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;selector xmlns:android&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;apk&#x2F;res&#x2F;android&quot;&gt;</span><br><span class="line">    &lt;item android:color&#x3D;&quot;@color&#x2F;white&quot; android:state_checked&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">    &lt;item android:color&#x3D;&quot;@color&#x2F;gray&quot; android:state_checked&#x3D;&quot;false&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;selector&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="二、Fragment定义"><a href="#二、Fragment定义" class="headerlink" title="二、Fragment定义"></a>二、Fragment定义</h1><h2 id="BaseFragment封装"><a href="#BaseFragment封装" class="headerlink" title="BaseFragment封装"></a>BaseFragment封装</h2><p>首先定义继承自<code>android.support.v4.app.Fragment</code>的BaseFragment抽象类作为四个Fragment的基类</p>
+<p>BaseFragment.class:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.rfdemo.fragment;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.support.annotation.NonNull;</span><br><span class="line"><span class="keyword">import</span> android.support.annotation.Nullable;</span><br><span class="line"><span class="keyword">import</span> android.support.v4.app.Fragment;</span><br><span class="line"><span class="keyword">import</span> android.view.LayoutInflater;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.view.ViewGroup;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> View mRootView;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        mRootView = inflater.inflate(attachLayoutResID(), container,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        initView();</span><br><span class="line"></span><br><span class="line">        initData();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> mRootView;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//返回Fragment的布局文件id</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">int</span> <span class="title">attachLayoutResID</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//找到控件id</span></span><br><span class="line">    <span class="keyword">protected</span> &lt;T extends View&gt; <span class="function">T <span class="title">findViewById</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(mRootView == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (T) mRootView.findViewById(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Fragment中view的初始化</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Fragment中data的初始化</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">initData</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="创建Fragment"><a href="#创建Fragment" class="headerlink" title="创建Fragment"></a>创建Fragment</h2><p>创建四个Fragment的布局文件，本demo中暂时只在每个fragment中定义一个TextView用于展示效果</p>
+<p>fragment_general.xml:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;RelativeLayout xmlns:android&#x3D;&quot;http:&#x2F;&#x2F;schemas.android.com&#x2F;apk&#x2F;res&#x2F;android&quot;</span><br><span class="line">    android:layout_width&#x3D;&quot;match_parent&quot;</span><br><span class="line">    android:layout_height&#x3D;&quot;match_parent&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:id&#x3D;&quot;@+id&#x2F;textView&quot;</span><br><span class="line">        android:layout_width&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height&#x3D;&quot;wrap_content&quot;</span><br><span class="line">        android:text&#x3D;&quot;&quot;</span><br><span class="line">        android:layout_centerInParent&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;RelativeLayout&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>GeneralFragment.java:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.rfdemo.fragment;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.widget.TextView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.example.rfdemo.R;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GeneralFragment</span> <span class="keyword">extends</span> <span class="title">BaseFragment</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> TextView tv_general;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">attachLayoutResID</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> R.layout.fragment_general;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        tv_general = (TextView) findViewById(R.id.textView);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        tv_general.setText(<span class="string">"通用设置"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>剩余三个Fragment的创建方法与此类似。</p>
+<h2 id="三、使用RadioGroup切换Fragment"><a href="#三、使用RadioGroup切换Fragment" class="headerlink" title="三、使用RadioGroup切换Fragment"></a>三、使用RadioGroup切换Fragment</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.rfdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.support.v4.app.Fragment;</span><br><span class="line"><span class="keyword">import</span> android.support.v4.app.FragmentTransaction;</span><br><span class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.widget.RadioButton;</span><br><span class="line"><span class="keyword">import</span> android.widget.RadioGroup;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.example.rfdemo.fragment.GeneralFragment;</span><br><span class="line"><span class="keyword">import</span> com.example.rfdemo.fragment.OperationFragment;</span><br><span class="line"><span class="keyword">import</span> com.example.rfdemo.fragment.SoundFragment;</span><br><span class="line"><span class="keyword">import</span> com.example.rfdemo.fragment.SystemFragment;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//定义控件</span></span><br><span class="line">    <span class="keyword">private</span> RadioGroup mRadioGroup;</span><br><span class="line">    <span class="keyword">private</span> RadioButton btn_general;</span><br><span class="line">    <span class="keyword">private</span> RadioButton btn_sound;</span><br><span class="line">    <span class="keyword">private</span> RadioButton btn_system;</span><br><span class="line">    <span class="keyword">private</span> RadioButton btn_operation;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//定义Fragment</span></span><br><span class="line">    <span class="keyword">private</span> GeneralFragment generalFragment;</span><br><span class="line">    <span class="keyword">private</span> SoundFragment soundFragment;</span><br><span class="line">    <span class="keyword">private</span> SystemFragment systemFragment;</span><br><span class="line">    <span class="keyword">private</span> OperationFragment operationFragment;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//定义Fragment数组存放四个Fragment</span></span><br><span class="line">    Fragment[] mFragments = <span class="keyword">new</span> Fragment[]&#123;</span><br><span class="line">            <span class="keyword">new</span> GeneralFragment(),</span><br><span class="line">            <span class="keyword">new</span> SoundFragment(),</span><br><span class="line">            <span class="keyword">new</span> SystemFragment(),</span><br><span class="line">            <span class="keyword">new</span> OperationFragment()</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//记录当前页面</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> currentIndex = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line">        initView();</span><br><span class="line"></span><br><span class="line">        initFragment();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        mRadioGroup = findViewById(R.id.radioGroup);</span><br><span class="line">        btn_general = findViewById(R.id.btn_general);</span><br><span class="line">        btn_sound = findViewById(R.id.btn_sound);</span><br><span class="line">        btn_system = findViewById(R.id.btn_system);</span><br><span class="line">        btn_operation = findViewById(R.id.btn_operation);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initFragment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (generalFragment == <span class="keyword">null</span>) &#123;</span><br><span class="line">            generalFragment = <span class="keyword">new</span> GeneralFragment();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (soundFragment == <span class="keyword">null</span>) &#123;</span><br><span class="line">            soundFragment = <span class="keyword">new</span> SoundFragment();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (systemFragment == <span class="keyword">null</span>) &#123;</span><br><span class="line">            systemFragment = <span class="keyword">new</span> SystemFragment();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (operationFragment == <span class="keyword">null</span>) &#123;</span><br><span class="line">            operationFragment = <span class="keyword">new</span> OperationFragment();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();</span><br><span class="line">        <span class="comment">//设置默认界面</span></span><br><span class="line">        ft.replace(R.id.rootLayout, mFragments[<span class="number">0</span>]).commit();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//RadioGroup选中事件监听</span></span><br><span class="line">        mRadioGroup.setOnCheckedChangeListener(<span class="keyword">new</span> RadioGroup.OnCheckedChangeListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCheckedChanged</span><span class="params">(RadioGroup group, <span class="keyword">int</span> checkedId)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">switch</span> (checkedId) &#123;</span><br><span class="line">                    <span class="keyword">case</span> R.id.btn_general:</span><br><span class="line">                        setIndexFragment(<span class="number">0</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> R.id.btn_sound:</span><br><span class="line">                        setIndexFragment(<span class="number">1</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> R.id.btn_system:</span><br><span class="line">                        setIndexFragment(<span class="number">2</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">case</span> R.id.btn_operation:</span><br><span class="line">                        setIndexFragment(<span class="number">3</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="keyword">default</span>:</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//切换Fragment</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setIndexFragment</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(currentIndex == index) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();</span><br><span class="line">        <span class="comment">//隐藏当前界面</span></span><br><span class="line">        ft.hide(mFragments[currentIndex]);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(!mFragments[index].isVisible()) &#123;</span><br><span class="line">            ft.replace(R.id.rootLayout, mFragments[index]).show(mFragments[index]);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ft.show(mFragments[index]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ft.commit();</span><br><span class="line">        currentIndex = index;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+	
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/02/23/Android%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%BC%80%E5%8F%91%E4%B9%8BAIDL%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%9A%84%E6%90%AD%E5%BB%BA/" rel="next" title="Android跨进程开发之AIDL通信框架的搭建">
+                <i class="fa fa-chevron-left"></i> Android跨进程开发之AIDL通信框架的搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/04/Okhttp3%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="prev" title="Okhttp3基本使用">
+                Okhttp3基本使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="bic" />
+            
+              <p class="site-author-name" itemprop="name">bic</p>
+              <p class="site-description motion-element" itemprop="description">peace</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、RadioGroup定义"><span class="nav-number">1.</span> <span class="nav-text">一、RadioGroup定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、Fragment定义"><span class="nav-number">2.</span> <span class="nav-text">二、Fragment定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BaseFragment封装"><span class="nav-number">2.1.</span> <span class="nav-text">BaseFragment封装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Fragment"><span class="nav-number">2.2.</span> <span class="nav-text">创建Fragment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、使用RadioGroup切换Fragment"><span class="nav-number">2.3.</span> <span class="nav-text">三、使用RadioGroup切换Fragment</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bic</span>
+
+  
+  
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+  
+
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">总访客<span id="busuanzi_value_site_uv"></span>人</span>
+    <span class="post-meta-divider">|</span>
+
+  
+
+</div>
+
+<section class="footer-time">
+    <span class="footer__copyright">
+    <div>
+    <span id="span_dt_dt"> </span>
+    <script language="javascript">
+      function show_date_time(){
+        window.setTimeout("show_date_time()", 1000);
+        BirthDay=new Date("12/12/2019 23:45:12");//这个日期是可以修改的
+        today=new Date();
+        timeold=(today.getTime()-BirthDay.getTime());//其实仅仅改了这里
+        sectimeold=timeold/1000
+        secondsold=Math.floor(sectimeold);
+        msPerDay=24*60*60*1000
+        e_daysold=timeold/msPerDay
+        daysold=Math.floor(e_daysold);
+        e_hrsold=(e_daysold-daysold)*24;
+        hrsold=Math.floor(e_hrsold);
+        e_minsold=(e_hrsold-hrsold)*60;
+        minsold=Math.floor((e_hrsold-hrsold)*60);
+        seconds=Math.floor((e_minsold-minsold)*60);
+        span_dt_dt.innerHTML="bic Blog已经运行 "+daysold+" 天 "+hrsold+" 小时 "+minsold+" 分 "+seconds+" 秒";
+      }
+      show_date_time();
+    </script>
+    </div>
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+</section>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
